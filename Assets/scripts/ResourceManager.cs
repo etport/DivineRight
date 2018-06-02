@@ -13,6 +13,7 @@ namespace RTS
         #region Fields
 
         static ConfigData configData;
+        static Vector3 invalidPosition = new Vector3(-9999, -9999, -9999); 
 
         #endregion
 
@@ -41,6 +42,11 @@ namespace RTS
         public static float MaxCameraHeight
         {
             get { return configData.MaxCameraHeight;  }
+        }
+
+        public static Vector3 InvalidPosition
+        {
+            get { return invalidPosition;  }
         }
         #endregion
 
