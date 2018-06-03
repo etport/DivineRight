@@ -164,16 +164,20 @@ public class UserInput : MonoBehaviour
                     if (worldObject)
                     {
                         player.SelectedObject = worldObject;
-                        worldObject.SetSelected(true); 
+                        worldObject.SetSelected(true, player.hud.GetPlayingArea()); 
                     }
                 }
             }
         }
     }
-
+    //Deselect on right click
     void RightMouseClick()
     {
-
+        if (player.hud.MouseInBounds() && player.SelectedObject)
+        {
+            player.SelectedObject.SetSelected(false, player.hud.GetPlayingArea());
+            player.SelectedObject = null;
+        }
     }
 
     GameObject FindHitObject()

@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using RTS; 
 
 public class WorldObject : MonoBehaviour {
 
-    #region Fields
+    #region Public Fields
+
     public string objectName;
     public Texture2D buildImage;
     public int cost;
@@ -12,16 +14,26 @@ public class WorldObject : MonoBehaviour {
     public int hitPoints;
     public int maxHitPoints;
 
+    #endregion
+
+
+    #region Protected Fields
+
     protected Player player;
     protected string[] actions = { };
     protected bool currentlySelected = false;
+    protected Bounds selectionBounds;
+    protected Rect playingArea = new Rect(0, 0, 0, 0); 
+
     #endregion
+    
 
     #region Protected Methods
 
     protected virtual void Awake()
     {
-
+        selectionBounds = ResourceManager.InvalidBounds;
+        CalculateBounds(); 
     }
     // Use this for initialization
     protected virtual void Start ()
@@ -37,15 +49,27 @@ public class WorldObject : MonoBehaviour {
 
     protected virtual void OnGUI()
     {
+        if (currentlySelected)
+        {
+            DrawSelection(); 
+        }
+    }
 
+    protected virtual void DrawSelectionBox(Rect selectBox)
+    {
+        GUI.Box(selectBox, ""); 
     }
     #endregion
 
     #region Public Methods
 
-    public void SetSelected (bool selected)
+    public void SetSelected (bool selected, Rect playingArea)
     {
         currentlySelected = selected; 
+        if (selected)
+        {
+            this.playingArea = playingArea; 
+        }
     }
 
     public string[] GetActions()
@@ -72,20 +96,41 @@ public class WorldObject : MonoBehaviour {
         }
     }
 
+
+    public void CalculateBounds()
+    {
+        selectionBounds = new Bounds(transform.position, Vector3.zero);
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            selectionBounds.Encapsulate(r.bounds);
+        }
+    }
+
     #endregion
 
     #region Private Methods
-    
+
     void ChangeSelection(WorldObject worldObject, Player controller)
     {
-        SetSelected(false); 
+        SetSelected(false, playingArea); 
         if (controller.SelectedObject)
         {
-            controller.SelectedObject.SetSelected(false);
+            controller.SelectedObject.SetSelected(false, playingArea);
             controller.SelectedObject = worldObject;
-            worldObject.SetSelected(true); 
+            worldObject.SetSelected(true, playingArea); 
         }
     }
+
+    void DrawSelection ()
+    {
+        GUI.skin = ResourceManager.SelectBoxSkin;
+        Rect selectBox = WorkManager.CalculateSelectionBox(selectionBounds, playingArea);
+
+        GUI.BeginGroup(playingArea);
+        DrawSelectionBox(selectBox);
+        GUI.EndGroup();
+    }
+
     #endregion
 
 }

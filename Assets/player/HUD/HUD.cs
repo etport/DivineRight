@@ -12,18 +12,21 @@ public class HUD : MonoBehaviour
     #region Public Fields
     public GUISkin resourceSkin;
     public GUISkin ordersSkin;
+    public GUISkin selectBoxSkin; 
     #endregion
 
     #region Private Fields
 
     //TODO load from csv
-    const int OrdersBarWidth = 150;
+    const int OrdersBarWidth = 100;
     const int ResourceBarHeight = 40;
     const int SelectionNameHeight = 15;
 
     Player player;
 
     #endregion
+
+   
 
     #region Private Methods
 
@@ -33,6 +36,7 @@ public class HUD : MonoBehaviour
     void Start ()
 	{
         player = transform.root.GetComponent<Player>();
+        ResourceManager.StoreSelectBoxItems(selectBoxSkin); 
 	}
 	
 	void OnGUI()
@@ -77,6 +81,11 @@ public class HUD : MonoBehaviour
         bool insideWidth = mousePosition.x >= 0 && mousePosition.x <= (Screen.width - OrdersBarWidth);
         bool insideHeight = mousePosition.y >= 0 && mousePosition.y <= (Screen.height - ResourceBarHeight);
         return insideWidth && insideHeight; 
+    }
+
+    public Rect GetPlayingArea()
+    {
+        return new Rect(0, ResourceBarHeight, (Screen.width - OrdersBarWidth), (Screen.height - ResourceBarHeight)); 
     }
     #endregion 
 }
